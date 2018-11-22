@@ -1,0 +1,116 @@
+{% extends 'public/base.html' %}
+{% load static %}
+{% block header %}
+    <body>
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.back()" class="">
+                <i class="am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            <a href="" class="">个人资料</a>
+        </h1>
+    </header>
+{% endblock %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="id" value="{{ id }}">
+        <div style="height: 49px;"></div>
+        <ul class="safty1">
+            <li>
+                <a href="" style="height: 7rem">
+                    <i style="margin-top: 25px;">头像</i>
+                    <div class="infor-pic" style="height: 5rem">
+                        {% if data.head_sculpture %}
+{#                            <img src=""/>#}
+                            <img src="/static/images/{{ data.head_sculpture }}" id="img0" style="width: 8rem;height: 5rem;">
+                            <input type="file" name="file0" id="file0" multiple="multiple"/>
+                        {% else %}
+                            <input type="file" name="file0" id="file0" multiple="multiple"/>
+                        {% endif %}
+                    </div>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:;">
+                    <i>昵称</i>
+                    <input type="text" class="infor-tele" placeholder="默契" name="nickname" value="{{ data.nickname }}"/>
+                </a>
+            </li>
+            <li>
+                <a href="javascript:;">
+                    <i>性别</i>
+                    <i class="infor-tele">
+                        <label class="am-radio-inline">
+                            <input type="radio" name="sex" {% if data.sex == 1 %}checked="checked" {% endif %} value="1"
+                                   data-am-ucheck>男
+                        </label>
+                        <label class="am-radio-inline">
+                            <input type="radio" name="sex" {% if data.sex == 2 %}checked="checked" {% endif %} value="2"
+                                   data-am-ucheck>女
+                        </label>
+                    </i>
+                </a>
+            </li>
+            <li>
+                <a href="">
+                    <i>生日</i>
+                    <input type="date" class="infor-tele" placeholder="出生日期" name="birthday"
+                           value="{{ data.birthday|date:'Y-m-d' }}"/>
+                </a>
+            </li>
+        </ul>
+        <div style="height: 10px; background: #efefef;"></div>
+        <ul class="safty1">
+            <li>
+                <i>学校</i>
+                <input type="text" class="infor-tele" placeholder="就读学校" name="school" value="{{ data.school }}"/>
+            </li>
+            <li>
+                <i>位置</i>
+                <input type="text" class="infor-tele" placeholder="详细地址" name="location" value="{{ data.location }}"/>
+            </li>
+            <li>
+                <i>故乡</i>
+                <input type="text" class="infor-tele" placeholder="来自哪里" name="hometown" value="{{ data.hometown }}"/>
+            </li>
+            <li>
+                <i>手机</i>
+                <input type="text" class="infor-tele" placeholder="13012345678" name="tel" value="{{ data.tel }}"/>
+            </li>
+        </ul>
+        <div style="height: 10px; background: #efefef;"></div>
+        <input type="submit" class="login-btn" value="保存">
+    </form>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/amazeui.min.js' %}"></script>
+{% endblock %}
+{% block foot_js %}
+    <script>
+        $(function () {
+            $("#file0").change(function () {
+                var objUrl = getObjectURL(this.files[0]);//获取文件信息
+                console.log("objUrl = " + objUrl);
+                if (objUrl) {
+                    $("#img0").attr("src", objUrl);
+                }
+            });
+
+            function getObjectURL(file) {
+                var url = null;
+                if (window.createObjectURL != undefined) {
+                    url = window.createObjectURL(file);
+                } else if (window.URL != undefined) { // mozilla(firefox)
+                    url = window.URL.createObjectURL(file);
+                } else if (window.webkitURL != undefined) { // webkit or chrome
+                    url = window.webkitURL.createObjectURL(file);
+                }
+                return url;
+            }
+        });
+
+    </script>
+{% endblock %}

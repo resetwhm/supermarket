@@ -26,7 +26,7 @@
         </div>
         <div class="mem-pic">
             {% if nick.head_sculpture %}
-                <div class="mem-pic-bg" style="background-image: url(/static/images/{{ nick.head_sculpture }});"></div>
+                <div class="mem-pic-bg" style="background-image: url( {{ MEDIA_URL }}{{ nick.head_img }});"></div>
                 {% else %}
                 <div class="mem-pic-bg" style="background-image: url({% static 'images/memtx.png' %});"></div>
             {% endif %}

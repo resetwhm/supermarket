@@ -3,7 +3,7 @@ import random
 import re
 import uuid
 
-from django.http import JsonResponse,HttpResponse
+from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django_redis import get_redis_connection
 
@@ -129,7 +129,7 @@ def info(request):
     if id:
         if request.method == 'POST':
             nickname = request.POST.get('nickname')
-            head_sculpture = request.POST.get('file0')
+            head_img = request.FILES['head']
             sex = request.POST.get('sex')
             birthday = request.POST.get('birthday')
             school = request.POST.get('school')
@@ -137,7 +137,8 @@ def info(request):
             hometown = request.POST.get('hometown')
             tel = request.POST.get('tel')
             id = register.objects.get(id=id)
-            User_info.objects.update(head_sculpture = head_sculpture ,nickname=nickname, sex=sex, birthday=birthday, school=school, location=location,
+            User_info.objects.update(head_img=head_img, nickname=nickname, sex=sex, birthday=birthday, school=school,
+                                     location=location,
                                      hometown=hometown, tel=tel, log_id=id)
             return redirect('person:member')
         else:
@@ -207,3 +208,6 @@ def send_phone_code(request):
 
     else:
         return JsonResponse({"sta": 1, "err": "请求方式错误"})
+
+
+

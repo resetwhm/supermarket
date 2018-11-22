@@ -21,7 +21,7 @@ class User_info(models.Model):
               (2, '女')]
     log_id = models.OneToOneField(to='register')
     head_sculpture = models.CharField(max_length=100, default=0)
-    head_img = models.ImageField(upload_to='head', default='images/infortx.png', verbose_name='头像')
+    head_img = models.ImageField(upload_to='', default='images/infortx.png', verbose_name='头像')
     nickname = models.CharField(max_length=30)
     sex = models.SmallIntegerField(choices=choice)
     birthday = models.DateField()

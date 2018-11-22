@@ -143,4 +143,4 @@ ACCESS_KEY_ID = "LTAI2qSiJdWP87em"
 ACCESS_KEY_SECRET = "FzORQ587PgGBoOAdmxzCjaxQi8klUi"
 
 MEDIA_URL = "/static/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media/')

@@ -1,7 +1,6 @@
 {% extends 'public/base.html' %}
 {% load static %}
 {% block header %}
-    <body>
     <header data-am-widget="header" class="am-header am-header-default sq-head ">
         <div class="am-header-left am-header-nav">
             <a href="javascript:history.back()" class="">
@@ -15,22 +14,24 @@
 {% endblock %}
 
 {% block content %}
-    <form action="" method="post">
+    <form action="" method="post" enctype="multipart/form-data">
         {% csrf_token %}
-        <input type="hidden" name="id" value="{{ id }}">
+        <input type="hidden" name="id" value="{{ id }}"/>
         <div style="height: 49px;"></div>
         <ul class="safty1">
             <li>
                 <a href="" style="height: 7rem">
                     <i style="margin-top: 25px;">头像</i>
                     <div class="infor-pic" style="height: 5rem">
-                        {% if data.head_sculpture %}
+{#                        {% if data.head_sculpture %}#}
 {#                            <img src=""/>#}
-                            <img src="/static/images/{{ data.head_sculpture }}" id="img0" style="width: 8rem;height: 5rem;">
-                            <input type="file" name="file0" id="file0" multiple="multiple"/>
-                        {% else %}
-                            <input type="file" name="file0" id="file0" multiple="multiple"/>
-                        {% endif %}
+{#                            <img src="/static/images/{{ data.head_sculpture }}" id="img0" style="width: 8rem;height: 5rem;">#}
+{#                            <input type="file" name="file0" id="file0" multiple="multiple"/>#}
+{#                        {% else %}#}
+{#                            <input type="file" name="file0" id="file0" multiple="multiple"/>#}
+{#                        {% endif %}#}
+                         <img src="{{ MEDIA_URL }}{{ data.head_img }}"/>
+                         <input type="file" name="head" />
                     </div>
                 </a>
             </li>
@@ -88,29 +89,29 @@
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/amazeui.min.js' %}"></script>
 {% endblock %}
-{% block foot_js %}
-    <script>
-        $(function () {
-            $("#file0").change(function () {
-                var objUrl = getObjectURL(this.files[0]);//获取文件信息
-                console.log("objUrl = " + objUrl);
-                if (objUrl) {
-                    $("#img0").attr("src", objUrl);
-                }
-            });
-
-            function getObjectURL(file) {
-                var url = null;
-                if (window.createObjectURL != undefined) {
-                    url = window.createObjectURL(file);
-                } else if (window.URL != undefined) { // mozilla(firefox)
-                    url = window.URL.createObjectURL(file);
-                } else if (window.webkitURL != undefined) { // webkit or chrome
-                    url = window.webkitURL.createObjectURL(file);
-                }
-                return url;
-            }
-        });
-
-    </script>
-{% endblock %}
+{#{% block foot_js %}#}
+{#    <script>#}
+{#        $(function () {#}
+{#            $("#file0").change(function () {#}
+{#                var objUrl = getObjectURL(this.files[0]);//获取文件信息#}
+{#                console.log("objUrl = " + objUrl);#}
+{#                if (objUrl) {#}
+{#                    $("#img0").attr("src", objUrl);#}
+{#                }#}
+{#            });#}
+{##}
+{#            function getObjectURL(file) {#}
+{#                var url = null;#}
+{#                if (window.createObjectURL != undefined) {#}
+{#                    url = window.createObjectURL(file);#}
+{#                } else if (window.URL != undefined) { // mozilla(firefox)#}
+{#                    url = window.URL.createObjectURL(file);#}
+{#                } else if (window.webkitURL != undefined) { // webkit or chrome#}
+{#                    url = window.webkitURL.createObjectURL(file);#}
+{#                }#}
+{#                return url;#}
+{#            }#}
+{#        });#}
+{##}
+{#    </script>#}
+{#{% endblock %}#}

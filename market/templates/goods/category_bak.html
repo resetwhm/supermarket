@@ -1,0 +1,163 @@
+{% extends 'public/base.html' %}
+{% load static %}
+{% block meta_css %}
+    <style>
+        .shop-list-mid .tit a {
+            color: #909090;
+            font-size: 1.4rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: normal;
+            text-overflow: ellipsis;
+        }
+    </style>
+{% endblock %}
+
+{% block header %}
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.back()" class="">
+                <i class="am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <div class="cate-search">
+            <input type="text" class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
+            <input type="button" class="cate-btn"/>
+        </div>
+    </header>
+    <div style="height: 49px;"></div>
+{% endblock %}
+
+{% block content %}
+    <ul class="list-nav" id="order">
+        <li class="current"><a href="{% url 'goods:category' %}"  >综合</a></li>
+        <li><a href="javascript:;" >销量</a></li>
+        <li><a href="javascript:;" ><i class="list-price">价格</i></a></li>
+        <li><a href="javascript:;" >新品</a></li>
+    </ul>
+    <div class="content-list">
+        <div class="list-left" id="cate">
+            {% for v in cate %}
+                <li {% if v.id == 1 %}class="current" {% endif %}><a href="javascript:;" class="cate" cate_id= {{ v.id }}>{{ v.catename }}</a></li>
+            {% endfor %}
+        </div>
+
+        <div class="list-right">
+            <ul class="list-pro" id="goodslist">
+                {% for v in goodlist %}
+                    <li>
+                        <a href="{% url 'goods:detail' v.id %}" class="img"><img src="{{ MEDIA_URL }}{{ v.img }}"
+                                                                            class="list-pic"/></a>
+                        <div class="shop-list-mid" style="width: 65%;">
+                            <div class="tit"><a href="{% url 'goods:detail' v.id %}" class="name">{{ v.name }}</a></div>
+                            <div class="am-gallery-desc" class="price">{{ v.price }}</div>
+                            <p class="sell">销量：{{ v.sell }}件</p>
+                        </div>
+                        <div class="list-cart">
+                            <div class="d-stock ">
+                                <a class="decrease">-</a>
+                                <input id="num" readonly="" class="text_box" name="" type="text" value="0">
+                                <a class="increase">+</a>
+                            </div>
+                        </div>
+                        <!--<a href="" class="list-cart"><img src="images/cart.png" width="30"/></a>-->
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block foot %}
+    <div style="height: 55px;"></div>
+    <div class="fix-bot">
+        <div class="fix-bot-cart"><i>8</i></div>
+        <a href="tureorder.html" class="list-js">去结算</a>
+        <a href="tureorder.html" class="list-jsk">一键快购</a>
+        <!--<div class="js-text">
+           <p><b>￥217.80</b></p>
+           <p class="js-car">购物满50元免运费</p>
+     </div>-->
+    </div>
+{% endblock %}
+<!--底部-->
+
+
+{% block foot_js %}
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/amazeui.min.js' %}"></script>
+    <script>
+        //购物数量加减
+        $(function () {
+            $('.increase').click(function () {
+                var self = $(this);
+                var current_num = parseInt(self.siblings('input').val());
+                current_num += 1;
+                if (current_num > 0) {
+                    self.siblings(".decrease").fadeIn();
+                    self.siblings(".text_box").fadeIn();
+                }
+                self.siblings('input').val(current_num);
+                update_item(self.siblings('input').data('item-id'));
+            });
+            $('.decrease').click(function () {
+                var self = $(this);
+                var current_num = parseInt(self.siblings('input').val());
+                if (current_num > 0) {
+                    current_num -= 1;
+                    if (current_num < 1) {
+                        self.fadeOut();
+                        self.siblings(".text_box").fadeOut();
+                    }
+                    self.siblings('input').val(current_num);
+                    update_item(self.siblings('input').data('item-id'));
+                }
+            });
+
+               $('.cate').on('click', function () {
+                html = '';
+                cate_id = $(this).attr('cate_id');
+                $('#cate>li').removeClass('current');
+                $(this).parent().addClass('current');
+                {#console.debug(111);#}
+                if (cate_id) {
+                    $.ajax({
+                        type: 'get',
+                        url: "{% url 'goods:category' %}?id=" + cate_id,
+                        dataType: 'json',
+                        success: function (data) {
+                            {#console.log(data.list.length);#}
+                            for(var i=0;i<data.list.length;i++) {
+                                html += ' <li>\n' +
+                                    '  <a href="/index/'+data.list[i].id +'.html " class="img"><img src="{{ MEDIA_URL }}'+data.list[i].img +'"\n' +
+                                    '                                                                            class="list-pic"/></a>\n' +
+                                    '  <div class="shop-list-mid" style="width: 65%;">\n' +
+                                    '  <div class="tit"><a href="/index/'+ data.list[i].id + '.html " class="name">'+data.list[i].name +'</a></div>\n' +
+                                    '  <div class="am-gallery-desc" class="price">'+ data.list[i].price +'</div>\n' +
+                                    '  <p class="sell">销量：'+data.list[i].sell +'件</p>\n' +
+                                    '  </div>\n' +
+                                    '  <div class="list-cart">\n' +
+                                    '  <div class="d-stock ">\n' +
+                                    '  <a class="decrease">-</a>\n' +
+                                    '  <input id="num" readonly="" class="text_box" name="" type="text" value="0">\n' +
+                                    '  <a class="increase">+</a>\n' +
+                                    '  </div>\n' +
+                                    '  </div>\n' +
+                                    '  <!--<a href="" class="list-cart"><img src="images/cart.png" width="30"/></a>-->\n' +
+                                    '  </li>';
+                                $('#goodslist').html(html)
+                            }
+                        }
+                    })
+
+                }
+            });
+
+        })
+
+    </script>
+{% endblock %}

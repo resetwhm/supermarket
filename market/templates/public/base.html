@@ -20,10 +20,11 @@
     {% block meta_css %}
 
     {% endblock %}
-    {% block meat_js %}
         <link href="{% static 'css/amazeui.min.css' %}" rel="stylesheet" type="text/css" />
 		<link href="{% static 'css/style.css' %}" rel="stylesheet" type="text/css" />
 		<link href="{% static 'css/check.css'%}" rel="stylesheet" type="text/css" />
+    {% block meat_js %}
+
     {% endblock %}
 </head>
 <body>
@@ -45,6 +46,11 @@
 {% block content %}
 
 {% endblock %}
+
+{% block foot %}
+
+{% endblock %}
+
      <script type='text/javascript'>
         (function () {
             new PopUp_api({el: '.index-qd', html: '.qd-box'});

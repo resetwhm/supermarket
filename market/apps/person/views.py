@@ -137,9 +137,10 @@ def info(request):
             hometown = request.POST.get('hometown')
             tel = request.POST.get('tel')
             id = register.objects.get(id=id)
-            User_info.objects.update(head_img=head_img, nickname=nickname, sex=sex, birthday=birthday, school=school,
-                                     location=location,
-                                     hometown=hometown, tel=tel, log_id=id)
+            User_info.objects.filter(log_id=id).update(head_img=head_img, nickname=nickname, sex=sex, birthday=birthday,
+                                                       school=school,
+                                                       location=location,
+                                                       hometown=hometown, tel=tel, log_id=id)
             return redirect('person:member')
         else:
             try:
@@ -162,8 +163,8 @@ def forgetpassword(request):
         data = request.POST
         form = ForgetFrom(data)
         if form.is_valid():
-            tel = request.POST.get('tel')
-            password = request.POST.get('password')
+            tel = form.cleaned_data.get('tel')
+            password = form.cleaned_data.get('password')
             h = hashlib.md5(password.encode('utf-8'))
             password = h.hexdigest()
             register.objects.filter(tel=tel).update(password=password)
@@ -208,6 +209,3 @@ def send_phone_code(request):
 
     else:
         return JsonResponse({"sta": 1, "err": "请求方式错误"})
-
-
-

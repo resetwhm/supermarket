@@ -1,0 +1,4 @@
+# 指定搜索的字段
+{{object.name}}
+{{object.introduction}}
+{{object.spu.content}}

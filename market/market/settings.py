@@ -42,7 +42,7 @@ INSTALLED_APPS = [
     'order.apps.OrderConfig',  # 订单
     'ckeditor',  # 添加ckeditor富文本编辑器
     'ckeditor_uploader',  # 添加ckeditor富文本编辑器文件上传部件
-
+    'haystack',  # 全文检索框架
 ]
 
 MIDDLEWARE = [
@@ -161,3 +161,30 @@ CKEDITOR_CONFIGS = {
         'toolbar': 'full',
     },
 }
+
+
+# # 全文检索框架的配置
+# HAYSTACK_CONNECTIONS = {
+#     'default': {
+#         # 配置搜索引擎
+#         'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+#         # 配置索引文件目录
+#         'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+#     },
+# }
+
+# 全文检索框架的配置
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        # 配置搜索引擎
+        # 'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        # 中文分词 使用jieba的whoosh引擎
+        'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',
+        # 配置索引文件目录
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    },
+}
+
+#当添加、修改、删除数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10

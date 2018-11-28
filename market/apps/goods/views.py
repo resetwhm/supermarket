@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render, redirect
 
 from goods.models import Ad, Active, Actarea, Actgoods, Category, SKU
+from django_redis import get_redis_connection
 
 
 def index(request):
@@ -79,7 +80,7 @@ def category(request, cate_id=0, order_id=0):
     goodlist = goodlist.order_by(order)
 
     # 分页
-    paginator = Paginator(goodlist, 1)
+    paginator = Paginator(goodlist, 2)
     page = request.GET.get('p', 1)
     try:
         goodlist = paginator.page(page)
@@ -88,10 +89,28 @@ def category(request, cate_id=0, order_id=0):
     except EmptyPage:
         goodlist = paginator.page(paginator.num_pages)
 
+    cartcount = 0
+    if request.session.get("id"):
+        user_id = request.session.get("id")
+        r = get_redis_connection('default')
+        user_key = "user_key_{}".format(user_id)
+        count = r.hvals(user_key)
+        for v in count:
+            cartcount += int(v)
+
     context = {
         'category': category,
         'cate_id': cate_id,
         'goodlist': goodlist,
         'order_id': order_id,
+        "count": cartcount
     }
     return render(request, 'goods/category.html', context)
+
+
+def city(request):
+    return render(request, 'goods/city.html')
+
+
+def village(request):
+    return render(request, 'goods/village.html')

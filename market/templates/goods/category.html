@@ -12,12 +12,6 @@
             white-space: normal;
             text-overflow: ellipsis;
         }
-
-        #order .list-price {
-            background: url({% if order_id == 2 %}{% static 'images/order-bot.png' %}{% elif order_id == 3 %}{% static 'images/order-top.png' %}{% else %}{% static 'images/order.png' %}{% endif %}) no-repeat right center;
-            padding-right: 20px;
-            font-style: normal;
-        }
     </style>
 
 {% endblock %}
@@ -30,8 +24,10 @@
             </a>
         </div>
         <div class="cate-search">
-            <input type="text" class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
-            <input type="button" class="cate-btn"/>
+            <form action="/search/" method="get">
+                <input type="text" name="q" class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
+                <input type="submit" class="cate-btn" value=""/>
+            </form>
         </div>
     </header>
     <div style="height: 49px;"></div>
@@ -70,7 +66,8 @@
                         <div class="list-cart">
                             <div class="d-stock ">
                                 <a class="decrease">-</a>
-                                <input id="num" readonly="" class="text_box" name="" type="text" value="0">
+                                <input id="num" readonly="" sku_id="{{ v.id }}" class="text_box" name="" type="text"
+                                       value="0"/>
                                 <a class="increase">+</a>
                             </div>
                         </div>
@@ -78,12 +75,12 @@
                     </li>
                 {% endfor %}
                 <hr>
-             {% if goodlist.has_previous %}
+                {% if goodlist.has_previous %}
                     <span><a href="?p={{ goodlist.previous_page_number }}">上一页</a></span>
-             {% endif %}
-             {% if goodlist.has_next %}
+                {% endif %}
+                {% if goodlist.has_next %}
                     <span><a href="?p={{ goodlist.next_page_number }}">下一页</a></span>
-            {% endif %}
+                {% endif %}
             </ul>
         </div>
 
@@ -94,9 +91,11 @@
 {% block foot %}
     <div style="height: 55px;"></div>
     <div class="fix-bot">
-        <div class="fix-bot-cart"><i>8</i></div>
-        <a href="tureorder.html" class="list-js">去结算</a>
-        <a href="tureorder.html" class="list-jsk">一键快购</a>
+        <a href="{% url 'cart:shopcart' %}">
+            <div class="fix-bot-cart"><i>{{ count }}</i></div>
+        </a>
+        <a href="{% url 'order:tureorder' %}" class="list-js">去结算</a>
+        <a href="{% url 'order:tureorder' %}" class="list-jsk">一键快购</a>
         <!--<div class="js-text">
            <p><b>￥217.80</b></p>
            <p class="js-car">购物满50元免运费</p>
@@ -105,42 +104,75 @@
 {% endblock %}
 <!--底部-->
 
-
 {% block foot_js %}
-    <script src="{% static 'js/jquery.min.js' %}"></script>
-    <script src="{% static 'js/amazeui.min.js' %}"></script>
     <script>
         //购物数量加减
         $(function () {
             $('.increase').click(function () {
                 var self = $(this);
+                var sku_id = $("#num").attr('sku_id');
                 var current_num = parseInt(self.siblings('input').val());
-                current_num += 1;
-                if (current_num > 0) {
-                    self.siblings(".decrease").fadeIn();
-                    self.siblings(".text_box").fadeIn();
-                }
-                self.siblings('input').val(current_num);
-                update_item(self.siblings('input').data('item-id'));
+
+                var num = 1;
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'cart:addcart' %}",
+                    data: {"sku_id": sku_id, "num": num, "csrfmiddlewaretoken": "{{ csrf_token  }}"},
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.code == 1) {
+                            var flag = confirm("未登录,是否要跳转到登录界面");
+                            if (flag) {
+                                location.href = "{% url 'person:login' %}?next={% url 'goods:category' cate_id order_id %}"
+                            }
+                        } else if (data.code == 0) {
+                            current_num += 1;
+                            if (current_num > 0) {
+                                self.siblings(".decrease").fadeIn();
+                                self.siblings(".text_box").fadeIn();
+                            }
+                            self.siblings('input').val(current_num);
+                            $(".fix-bot-cart i").text(data.total);
+                        }
+                    }
+                });
             });
+
             $('.decrease').click(function () {
                 var self = $(this);
+                var sku_id = $("#num").attr('sku_id');
                 var current_num = parseInt(self.siblings('input').val());
+                var num = -1;
                 if (current_num > 0) {
-                    current_num -= 1;
-                    if (current_num < 1) {
-                        self.fadeOut();
-                        self.siblings(".text_box").fadeOut();
-                    }
-                    self.siblings('input').val(current_num);
-                    update_item(self.siblings('input').data('item-id'));
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'cart:addcart' %}",
+                        data: {"sku_id": sku_id, "num": num, "csrfmiddlewaretoken": "{{ csrf_token  }}"},
+                        dataType: "json",
+                        success: function (data) {
+                            if (data.code == 1) {
+                                var flag = confirm("未登录,是否要跳转到登录界面");
+                                if (flag) {
+                                    location.href = "{% url 'person:login' %}?next={% url 'goods:category' cate_id order_id %}"
+                                }
+                            } else if (data.code == 0) {
+                                current_num -= 1;
+                                if (current_num < 1) {
+                                    self.fadeOut();
+                                    self.siblings(".text_box").fadeOut();
+                                }
+                                self.siblings('input').val(current_num);
+                                $(".fix-bot-cart i").text(data.total)
+                            }
+                        }
+                    });
                 }
             });
 
-            if("{{ order_id }}"== 2){
-                $('.list-price').parent("a").attr('href','{% url 'goods:category' cate_id 3 %}')
-            }else if("{{ order_id }}"== 3){
-                $('.list-price').parent("a").attr('href','{% url 'goods:category' cate_id 2 %}')
+            if ("{{ order_id }}" == 2) {
+                $('.list-price').parent("a").attr('href', '{% url 'goods:category' cate_id 3 %}')
+            } else if ("{{ order_id }}" == 3) {
+                $('.list-price').parent("a").attr('href', '{% url 'goods:category' cate_id 2 %}')
             }
         })
 

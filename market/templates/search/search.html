@@ -1,0 +1,131 @@
+{% extends 'public/base.html' %}
+{% load static %}
+{% load highlight %}
+{% block meta_css %}
+    <style>
+        .shop-list-mid .tit a {
+            color: #909090;
+            font-size: 1.4rem;
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            white-space: normal;
+            text-overflow: ellipsis;
+        }
+
+        #order .list-price {
+            background: url({% if order_id == 2 %}{% static 'images/order-bot.png' %}{% elif order_id == 3 %}{% static 'images/order-top.png' %}{% else %}{% static 'images/order.png' %}{% endif %}) no-repeat right center;
+            padding-right: 20px;
+            font-style: normal;
+        }
+    .class_name{
+        color: red;
+    }
+    </style>
+
+{% endblock %}
+{% block header %}
+    <header data-am-widget="header" class="am-header am-header-default sq-head ">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.back()" class="">
+                <i class="am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <div class="cate-search">
+            <form action="/search/" method="get">
+                <input type="text" name="q" value='{{ query }}' class="cate-input" placeholder="请输入您要的搜索的产品关键词"/>
+                <input type="submit" class="cate-btn" value=""/>
+            </form>
+        </div>
+    </header>
+    <div style="height: 49px;"></div>
+{% endblock %}
+{% block content %}
+    {% if query %}
+        <ul class="list-pro" style="margin-top: 20px">
+            {% for result in page %}
+                <li>
+                    <a href="{% url 'goods:detail' result.object.pk %}"><img
+                            src="{{ MEDIA_URL }}{{ result.object.img }}" class="list-pic1"/></a>
+                    <div class="shop-list-mid" style="width: 65%;">
+                        <div class="tit">
+                            <a href="{% url 'goods:detail' result.object.pk %}">
+                                {% highlight result.object.spu.name  with query css_class "class_name" html_tag "span" %}
+                                {% highlight result.object.name  with query css_class "class_name" html_tag "span" %}
+
+                            </a>
+                        </div>
+                        <div class="am-gallery-desc">￥{{ result.object.price }}</div>
+                        <p>销量：{{ result.object.sell }}件</p>
+                    </div>
+                    <div class="list-cart">
+                        <div class="d-stock ">
+                            <a class="decrease">-</a>
+                            <input id="num" readonly="" class="text_box" name="" type="text" value="0">
+                            <a class="increase">+</a>
+                        </div>
+                    </div>
+                </li>
+            {% empty %}
+                <li>没有找到您搜索的产品！</li>
+            {% endfor %}
+        </ul>
+
+    {% endif %}
+    {% if page.has_previous %}
+        <span><a href="?q={{ query }}&p={{ page.previous_page_number }}">上一页</a></span>
+    {% endif %}
+    {% if goodlist.has_next %}
+        <span><a href="?q={{ query }}&p={{ page.next_page_number }}">下一页</a></span>
+    {% endif %}
+{% endblock %}
+{% block foot %}
+    <div style="height: 55px;"></div>
+    <div class="fix-bot">
+        <div class="fix-bot-cart"><i>8</i></div>
+        <a href="{% url 'cart:shopcart' %}" class="list-js">去结算</a>
+        <a href="{% url 'cart:shopcart' %}" class="list-jsk">一键快购</a>
+        <!--<div class="js-text">
+           <p><b>￥217.80</b></p>
+           <p class="js-car">购物满50元免运费</p>
+     </div>-->
+    </div>
+{% endblock %}
+<!--底部-->
+
+
+{% block foot_js %}
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/amazeui.min.js' %}"></script>
+    <script>
+        //购物数量加减
+        $(function () {
+            $('.increase').click(function () {
+                var self = $(this);
+                var current_num = parseInt(self.siblings('input').val());
+                current_num += 1;
+                if (current_num > 0) {
+                    self.siblings(".decrease").fadeIn();
+                    self.siblings(".text_box").fadeIn();
+                }
+                self.siblings('input').val(current_num);
+                update_item(self.siblings('input').data('item-id'));
+            });
+            $('.decrease').click(function () {
+                var self = $(this);
+                var current_num = parseInt(self.siblings('input').val());
+                if (current_num > 0) {
+                    current_num -= 1;
+                    if (current_num < 1) {
+                        self.fadeOut();
+                        self.siblings(".text_box").fadeOut();
+                    }
+                    self.siblings('input').val(current_num);
+                    update_item(self.siblings('input').data('item-id'));
+                }
+            });
+        })
+
+    </script>
+{% endblock %}

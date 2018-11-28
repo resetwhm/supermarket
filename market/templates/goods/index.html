@@ -1,16 +1,28 @@
 {% extends 'public/base.html' %}
 {% load static %}
+{% block meta_css %}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>根据ip定位</title>
+    <link rel="stylesheet" href="https://a.amap.com/jsapi_demos/static/demo-center/css/demo-center.css"/>
+    <style type="text/css">
+        html, body, #container {
+            height: 100%;
+        }
+    </style>
+{% endblock %}
 {% block header %}
     <header data-am-widget="header" class="am-header am-header-default sq-head1">
         <div class="am-header-left am-header-nav">
-            <a href="city.html" class="" style="color: #fff;">
-                <img src="{% static 'images/city.png' %}"/>
-                <p style="font-size: 12px; margin-top: -35px;">南昌</p>
+            <a href="{% url 'goods:city' %}" class="" style="color: #fff;">
+                <img src="{% static 'images/city.png' %}" id="location"/>
+                <p style="font-size: 12px; margin-top: -35px;" id='info'></p>
             </a>
         </div>
         <h1 class="am-header-title1">
             <div class="search-box">
-                <a href="village.html" class="index-search">南昌大学前湖校区∨</a>
+                <a href="{% url 'goods:village' %}" class="index-search">源码时代成都校区∨</a>
                 <!--  <input type="submit" value="" class="search-icon" /> -->
             </div>
         </h1>
@@ -113,19 +125,19 @@
 
         <ul data-am-widget="gallery" class="am-gallery pro-list am-avg-sm-2 am-avg-md-2 am-avg-lg-4 am-gallery-default">
 
-         {% for actgoods in area.actgoods_set.all %}
-                    <li>
-                        <div class="am-gallery-item">
-                            <a href="{% url 'goods:detail' actgoods.sku.pk %}" class="">
-                                <img src=" {{ MEDIA_URL }}{{ actgoods.sku.img }}"/>
-                                <h3 class="am-gallery-title">{{ actgoods.sku.spu.name }}{{ actgoods.sku.name }}</h3>
-                                <div class="am-gallery-desc">￥{{ actgoods.sku.price }}</div>
-                            </a>
-                        </div>
-                    </li>
-                {% endfor %}
+            {% for actgoods in area.actgoods_set.all %}
+                <li>
+                    <div class="am-gallery-item">
+                        <a href="{% url 'goods:detail' actgoods.sku.pk %}" class="">
+                            <img src=" {{ MEDIA_URL }}{{ actgoods.sku.img }}"/>
+                            <h3 class="am-gallery-title">{{ actgoods.sku.spu.name }}{{ actgoods.sku.name }}</h3>
+                            <div class="am-gallery-desc">￥{{ actgoods.sku.price }}</div>
+                        </a>
+                    </div>
+                </li>
+            {% endfor %}
         </ul>
-   {% endfor %}
+    {% endfor %}
     <!--签到-->
     <div class="qd-box">
         <div class="popup-title">
@@ -177,6 +189,31 @@
         </ul>
     </div>
 
+
+{#定位#}
+<script type="text/javascript" src="https://webapi.amap.com/maps?v=1.4.10&key=7204bc8ae2de8a23baa3790c30176fef&plugin=AMap.CitySearch"></script>
+<script type="text/javascript">
+    //获取用户所在城市信息
+    function showCityInfo() {
+        //实例化城市查询类
+        var citysearch = new AMap.CitySearch();
+        //自动获取用户IP，返回当前城市
+        citysearch.getLocalCity(function(status, result) {
+            if (status === 'complete' && result.info === 'OK') {
+                if (result && result.city && result.bounds) {
+                    var cityinfo = result.city;
+                    var citybounds = result.bounds;
+                    document.getElementById('info').innerHTML = cityinfo;
+                    //地图显示当前城市
+                    map.setBounds(citybounds);
+                }
+            } else {
+                document.getElementById('info').innerHTML = result.info;
+            }
+        });
+    }
+    showCityInfo();
+</script>
 {% endblock %}
 
 {% block foot_js %}
@@ -188,4 +225,5 @@
 
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/amazeui.min.js' %}"></script>
+
 {% endblock %}

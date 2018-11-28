@@ -58,12 +58,10 @@
         <h4>数量：</h4>
         <div class="d-stock">
             <a class="decrease">-</a>
-            <input id="num" readonly="" class="text_box" name="" type="text" value="1">
-            <input id="id" type="hidden" value="644">
+            <input id="num" readonly="" sku_id="{{ sku.id }}" class="text_box" name="" type="text" value="1">
             <a class="increase">+</a>
-            <span id="dprice" class="price" style="display:none"> 36</span>
         </div>
-        <h4>{{ sku.unit }}</h4>
+        <h4>{% if sku.unit == 1 %}斤{% elif sku.unit == 2 %}件{% elif sku.unit == 3 %}箱{% endif %}</h4>
     </div>
     <div style="background: #eee; height: 10px;"></div>
     <div class="am-tabs detail-list" data-am-tabs>
@@ -130,8 +128,8 @@
     <!--底部-->
     <div style=" height: 55px;"></div>
     <ul class="fix-shopping">
-        <li><a href="shopcart.html" class="join">加入购物车</a></li>
-        <li><a href="tureorder.html" class="imm-buy">立即购买</a></li>
+        <li><a href="javascript:;" class="join" style="background: #28ff79">加入购物车</a></li>
+        <li><a href="{% url 'order:tureorder' %}" class="imm-buy">立即购买</a></li>
     </ul>
 
 {% endblock %}
@@ -144,16 +142,36 @@
                 var current_num = parseInt(self.siblings('input').val());
                 current_num += 1;
                 self.siblings('input').val(current_num);
-                update_item(self.siblings('input').data('item-id'));
-            })
+
+            });
             $('.decrease').click(function () {
                 var self = $(this);
                 var current_num = parseInt(self.siblings('input').val());
                 if (current_num > 1) {
                     current_num -= 1;
                     self.siblings('input').val(current_num);
-                    update_item(self.siblings('input').data('item-id'));
+
                 }
+            });
+
+            $(".join").on('click', function () {
+                sku_id = $("#num").attr('sku_id');
+                num = $("#num").val();
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'cart:addcart' %}",
+                    data: {"sku_id": sku_id, "num": num, "csrfmiddlewaretoken": "{{ csrf_token  }}"},
+                    dataType: "json",
+                    success: function (data) {
+                        if (data.code == 1) {
+                            var flag = confirm("未登录,是否要跳转到登录界面");
+                            if (flag) {
+                                location.href = "{% url 'person:login' %}?next={% url 'goods:detail' sku.id %}"
+                            }
+                        }
+                    }
+                });
+                console.debug(sku_id, num)
             })
         })
     </script>

@@ -42,7 +42,11 @@ def login(request):
             # 调用登陆的方法,放在helper模块中的
             my_login(request, user)
             # 跳转到用户中心页面
-            return redirect('person:member')
+            next = request.GET.get('next')
+            if next:
+                return redirect(next)
+            else:
+                return redirect('person:member')
             # if data:
             #     request.session['id'] = data.id
             #     return redirect('person:member')

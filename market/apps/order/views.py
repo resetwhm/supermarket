@@ -2,6 +2,7 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django_redis import get_redis_connection
 
+from goods.models import SKU
 from order.forms import AddressForm, AddresseditForm
 from person.models import Address
 
@@ -121,15 +122,61 @@ def default(request):
         return JsonResponse({"code": 1, "err": "请求方式错误"})
 
 
+# 添加订单
+def addorder(request):
+    id = request.session.get('id')
+    goods = request.POST.get('goods')
+    r = get_redis_connection('default')
+    goods = goods.strip(" ")
+    goods = goods.split(" ")
+    order_key = "order_key_{}".format(id)
+    user_key = "user_key_{}".format(id)
+    r.delete(order_key)
+    for sku_id in goods:
+        num = r.hget(user_key, sku_id)
+        num = int(num)
+        r.hset(order_key, sku_id, num)
+    return JsonResponse({"code": 0})
+
+
 # 购物车
 def tureorder(request):
     id = request.session.get('id')
+    r = get_redis_connection('default')
+    goodslist = []
+    order_key = "order_key_{}".format(id)
+    goods = r.hgetall(order_key)
+    for sku_id in goods:
+        sku = SKU.objects.get(pk=sku_id)
+        r = get_redis_connection('default')
+        num = r.hget(order_key, sku_id)
+        sku.num = int(num)
+        goodslist.append(sku)
+    print(goodslist)
     address = Address.objects.filter(log_id=id, isDefault=True, isdelete=False).first()
     context = {
-        "address": address
+        "address": address,
+        "goodslist": goodslist,
     }
     return render(request, 'cart/tureorder.html', context)
 
 
 def order(request):
-    return render(request, 'cart/order.html')
+    id = request.session.get('id')
+    r = get_redis_connection('default')
+    goodslist = []
+    order_key = "order_key_{}".format(id)
+    goods = r.hgetall(order_key)
+    for sku_id in goods:
+        sku = SKU.objects.get(pk=sku_id)
+        r = get_redis_connection('default')
+        num = r.hget(order_key, sku_id)
+        sku.num = int(num)
+        goodslist.append(sku)
+    print(goodslist)
+    address = Address.objects.filter(log_id=id, isDefault=True, isdelete=False).first()
+    context = {
+        "address": address,
+        "goodslist": goodslist,
+    }
+    return render(request, 'cart/order.html',context)

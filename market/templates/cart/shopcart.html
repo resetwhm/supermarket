@@ -166,7 +166,7 @@
                     total += price * num;
                 });
                 {#console.debug(total)#}
-                $('.js-text').find('span').text(total)
+                $('.js-text').find('span').text(total.toFixed(2))
 
             }
 
@@ -197,26 +197,22 @@
                 //商品id , 数量 ,总价
                 var li = $('.shopcart-list').find(':checked').parents('li');
                 var num = li.find('.num');
-                var price = $('.js-text').find('span').text();
-                console.debug(price);
-                {#var count = [];#}
-                var goods =[];
+                var goods ="";
                 {#var single_price =[];#}
                 $.each(num, function (i, e) {
-                    {#count.push($(e).val());#}
-                    goods.push($(e).attr('sku_id'));
-                    {#single_price.push($(e).attr('single_price'));#}
+                    goods += $(e).attr('sku_id');
+                    goods +=" ";
                 });
-                {#console.debug(count);#}
                 console.debug(goods);
-                {#console.debug(single_price);#}
                 $.ajax({
                     type:"POST",
-                    url:"{% url 'order:tureorder' %}",
+                    url:"{% url 'order:addorder' %}",
                     data:{"goods":goods,"csrfmiddlewaretoken":"{{ csrf_token }}"},
                     dataType:"json",
                     success:function (data) {
-                        console.debug(111)
+                        if(data.code==0){
+                             location.href="{% url 'order:tureorder' %}"
+                        }
                     }
                 })
             })

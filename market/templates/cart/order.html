@@ -3,12 +3,12 @@
 {% block meat_js %}
     <script src="{% static 'js/date.js' %}"></script>
 		<script src="{% static 'js/iscroll.js' %}"></script>
-		<script type="text/javascript">
-			$(function(){
-				$('#beginTime').date();
-				$('#endTime').date({theme:"datetime"});
-			});
-        </script>
+{#		<script type="text/javascript">#}
+{#			$(function(){#}
+{#				$('#beginTime').date();#}
+{#				$('#endTime').date({theme:"datetime"});#}
+{#			});#}
+{#        </script>#}
 {% endblock %}
  {% block header %}
     <header data-am-widget="header" class="am-header am-header-default sq-head ">
@@ -26,31 +26,36 @@
     <div style="height: 49px;"></div>
 	    <h5 class="order-tit">收货人信息</h5>
 	    <div class="order-name">
-	    	<a href="gladdress.html">
-	    		<p class="order-tele">宋科&nbsp;&nbsp;&nbsp;15180163170</p>
-	    		<p class="order-add">江西省南昌市 青云谱区解放西路258号</p>
+	    	<a href="javascript:;">
+	    		<p class="order-tele">{{ address.name }}&nbsp;&nbsp;&nbsp;{{ address.tel }}</p>
+	    		<p class="order-add"> {{ address.hcity }}{{ address.hproper }}-{{ address.harea }}{{ address.brief }}</p>
 	    	</a>
 	    	<i class="am-icon-angle-right"></i>
 	    </div>
         <div style="background: #eee; height: 10px;"></div>
         <h5 class="order-tit">确认订单信息</h5>
         <ul class="shopcart-list" style="padding-bottom: 0; margin-top: 0;">
+        {% for goods in goodslist %}
+
 	    	<li>
-                <img src="{% static 'images/test3.png' %}" class="shop-pic" />
+                <img src="{{ MEDIA_URL }}{{ goods.img }}" class="shop-pic" />
                 <div class="order-mid">
-                	<div class="tit">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</div>
-                	<div class="order-price">￥169 <i>X2</i></div>
+                	<div class="tit">{{ goods.name }}</div>
+                	<div class="order-price">￥<span class="price">{{ goods.price }}</span> <i>X<span
+                            class="num">{{ goods.num }}</span></i></div>
                 </div>
 	    	</li>
+        {% endfor %}
+
 	    </ul>
 	    <ul class="order-infor">
 	    	<li class="order-infor-first">
 	    		<span>商品总计：</span>
-	    		<i>￥88.00</i>
+	    		<i>￥<span id="total"></span></i>
 	    	</li>
 	    	<li class="order-infor-first">
 	    		<span>运费：</span>
-	    		<i>包邮 ¥ </i>
+	    		<i>包邮<span>￥<span id="transmoney">20</span></span></i>
 	    	</li>
 	    </ul>
 	    <!--<div style="background: #eee; height: 10px;"></div>
@@ -87,7 +92,7 @@
        <div style="height: 55px;"></div>
 	    <div class="shop-fix">
 	    	<div class="order-text">
-	    		应付总额：<span>￥188</span>
+	    		应付总额：<span>￥<span id="myprice"></span></span>
 	    	</div>
 	    	<a href="" class="js-btn">确认支付</a>
 	    </div>
@@ -96,7 +101,7 @@
  <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default sq-foot am-no-layout" id="">
       <ul class="am-navbar-nav am-cf am-avg-sm-5">
           <li>
-            <a href="index.html" class="">
+            <a href="{% url 'goods:index' %}" class="">
                 <span class="am-icon-home"></span>
                 <span class="am-navbar-label">首页</span>
             </a>
@@ -114,14 +119,14 @@
             </a>
           </li>
           <li>
-            <a href="allorder.html" class="">
+            <a href="{% url 'person:allorder' %}" class="">
                 <span class="am-icon-file-text"></span>
                 <span class="am-navbar-label">订单</span>
             </a>
           </li>
 
           <li>
-            <a href="member.html" class="curr">
+            <a href="{% url 'person:member' %}" class="curr">
                 <span class="am-icon-user"></span>
                 <span class="am-navbar-label">我的</span>
             </a>
@@ -131,4 +136,25 @@
 
  {% endblock %}
 
+{% block foot_js %}
+<script>
+        $(function () {
+            // 计算价格
+            var li = $(".shopcart-list li");
+            var price = 0;
+            $.each(li, function (i, e) {
+                var single_price = $(e).find(".price").text();
+                var number = $(e).find(".num").text();
+                price += single_price*number
+            });
+            {#console.debug(price.toFixed(2))#}
+            $('.order-infor').find("#total").text(price.toFixed(2));
+            var transmoney = $('.order-infor-first').find("#transmoney").text();
+            myprice = price + parseInt(transmoney) ;
+            $('.order-text').find("#myprice").text(myprice.toFixed(2))
 
+            // 提交订
+
+        })
+    </script>
+{% endblock %}

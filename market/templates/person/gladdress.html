@@ -22,19 +22,64 @@
 {% block content %}
     <ul class="address-list">
         {% for v in data %}
-            <li class="curr">
+            <li {% if v.isDefault %}class="curr"{% endif %} liid = {{ v.id }}>
                 <p>收货人：{{ v.name }}&nbsp;&nbsp;{{ v.tel }}</p>
                 <p class="order-add1">收货地址: {{ v.hcity }}-{{ v.hproper }}-{{ v.harea }}-{{ v.brief }}</p>
                 <hr/>
                 <div class="address-cz">
                     <label class="am-radio am-warning">
-                        <input type="radio" name="radio3" value="" data-am-ucheck {% if v.isDefault %}checked{% endif %}> 设为默认
+                        <input type="radio" name="radio3" value="" data-am-ucheck
+                               {% if v.isDefault %}checked{% endif %} class="def"> 设为默认
                     </label>
-                    <a href=""><img src="{% static 'images/bj.png' %}" width="18"/>&nbsp;编辑</a>
-                    <a href="">删除</a>
+                    <a href="{% url 'order:edit' v.id %}"><img src="{% static 'images/bj.png' %}"
+                                                               width="18"/>&nbsp;编辑</a>
+                    <a href="javascript:;" class="del">删除</a>
                 </div>
             </li>
         {% endfor %}
     </ul>
 {% endblock %}
+{% block foot_js %}
+    <script>
+        $(function () {
+            $(".del").on('click', function () {
+                var li = $(this).parents('li');
+                var id = li.attr("liid");
+                $.ajax({
+                    type:'POST',
+                    url:"{% url 'order:delete' %}",
+                    data:{"id":id,"csrfmiddlewaretoken":"{{ csrf_token }}"},
+                    dataType:"json",
+                    success:function (data) {
+                        if(data.code==0){
+                            li.remove()
+                        }else{
+                            alert("删除失败")
+                        }
 
+                    }
+                })
+            });
+
+            $(".def").on('click', function () {
+                var li = $(this).parents('li');
+                var id = li.attr("liid");
+                $.ajax({
+                    type:'POST',
+                    url:"{% url 'order:default' %}",
+                    data:{"id":id,"csrfmiddlewaretoken":"{{ csrf_token }}"},
+                    dataType:"json",
+                    success:function (data) {
+                        if(data.code==0){
+                            $('.address-list li').removeClass("curr");
+                            li.addClass("curr");
+                            li.find(".def").attr('checked',"checked");
+                        }else {
+                            alert('修改失败')
+                        }
+                    }
+                })
+            })
+        })
+    </script>
+{% endblock %}

@@ -1,6 +1,16 @@
 {% extends 'public/base.html' %}
 {% load static %}
-{% block header %}
+{% block meat_js %}
+    <script src="{% static 'js/date.js' %}"></script>
+		<script src="{% static 'js/iscroll.js' %}"></script>
+		<script type="text/javascript">
+			$(function(){
+				$('#beginTime').date();
+				$('#endTime').date({theme:"datetime"});
+			});
+        </script>
+{% endblock %}
+ {% block header %}
     <header data-am-widget="header" class="am-header am-header-default sq-head ">
 			<div class="am-header-left am-header-nav">
 				<a href="javascript:history.back()" class="">
@@ -11,23 +21,20 @@
   	            <a href="" class="">确认订单</a>
             </h1>
 	    </header>
+ {% endblock %}
+ {% block content %}
     <div style="height: 49px;"></div>
-{% endblock %}
-
-{% block content %}
-     <div class="add-address">
-           <a href="{% url 'order:address' %}">+新建收货地址</a>
-           <i class="am-icon-angle-right"></i>
-        </div>
+	    <h5 class="order-tit">收货人信息</h5>
+	    <div class="order-name">
+	    	<a href="gladdress.html">
+	    		<p class="order-tele">宋科&nbsp;&nbsp;&nbsp;15180163170</p>
+	    		<p class="order-add">江西省南昌市 青云谱区解放西路258号</p>
+	    	</a>
+	    	<i class="am-icon-angle-right"></i>
+	    </div>
         <div style="background: #eee; height: 10px;"></div>
-        <ul class="shopcart-list" style="padding-bottom: 0;">
-	    	<li>
-                <img src="{% static 'images/test3.png' %}" class="shop-pic" />
-                <div class="order-mid">
-                	<div class="tit">法国加力果12个装 进口新鲜水果 嘎啦苹果 包邮</div>
-                	<div class="order-price">￥169 <i>X2</i></div>
-                </div>
-	    	</li>
+        <h5 class="order-tit">确认订单信息</h5>
+        <ul class="shopcart-list" style="padding-bottom: 0; margin-top: 0;">
 	    	<li>
                 <img src="{% static 'images/test3.png' %}" class="shop-pic" />
                 <div class="order-mid">
@@ -43,34 +50,53 @@
 	    	</li>
 	    	<li class="order-infor-first">
 	    		<span>运费：</span>
-	    		<i>包邮</i>
-	    	</li>
-	    	<li class="order-infor-first">
-	    		<a href="">积分抵费></a>
-	    	</li>
-	    	<li class="order-infor-first">
-	    		<a href="">选择优惠券></a>
+	    		<i>包邮 ¥ </i>
 	    	</li>
 	    </ul>
+	    <!--<div style="background: #eee; height: 10px;"></div>
+
+	    <input id="beginTime" class="select-time" placeholder="请选择配送时间 >" /></div>
+		<div id="datePlugin"></div>-->
 	    <div style="background: #eee; height: 10px;"></div>
 	    <textarea placeholder="备注说明" class="bz-infor"></textarea>
 	    <div style="background: #eee; height: 10px;"></div>
-	    <div style="height: 55px;"></div>
+
+         <ul class="pay-style">
+	    	<li>
+		   	 	<img src="{% static 'images/zhi.png' %}" width="50" />
+		   	 	<span>
+		   	 		<p>支付宝</p>
+		   	 		<p class="descript">推荐有支付宝账号的用户使用</p>
+		   	 	</span>
+		   	 	<label class="am-radio-inline">
+				    <input type="radio" checked="checked" name="radio10" value="1" data-am-ucheck>
+				</label>
+	   	    </li>
+	   	    <li>
+		   	 	<img src="{% static 'images/wei.png' %}" width="50" />
+		   	 	<span>
+		   	 		<p>微信支付</p>
+		   	 		<p class="descript">推荐安装微信5.0及以上版本的使用</p>
+		   	 	</span>
+		   	 	<label class="am-radio-inline">
+				    <input type="radio" name="radio10" value="1" data-am-ucheck>
+				 </label>
+		   	</li>
+	    </ul>
+       <div style="height: 55px;"></div>
+       <div style="height: 55px;"></div>
 	    <div class="shop-fix">
 	    	<div class="order-text">
 	    		应付总额：<span>￥188</span>
 	    	</div>
-	    	<a href="order.html" class="js-btn">提交订单</a>
+	    	<a href="" class="js-btn">确认支付</a>
 	    </div>
-{% endblock %}
-
-{% block foot %}
-    <!--底部-->
+<!--底部-->
  <div style="height: 55px;"></div>
  <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default sq-foot am-no-layout" id="">
       <ul class="am-navbar-nav am-cf am-avg-sm-5">
           <li>
-            <a href="{% url 'goods:index' %}" class="">
+            <a href="index.html" class="">
                 <span class="am-icon-home"></span>
                 <span class="am-navbar-label">首页</span>
             </a>
@@ -82,20 +108,20 @@
             </a>
           </li>
           <li>
-            <a href="{% url 'cart:shopcart' %}" class="">
+            <a href="shopcart.html" class="">
                 <span class="am-icon-shopping-cart"></span>
                 <span class="am-navbar-label">购物车</span>
             </a>
           </li>
           <li>
-            <a href="{% url 'person:allorder' %}" class="">
+            <a href="allorder.html" class="">
                 <span class="am-icon-file-text"></span>
                 <span class="am-navbar-label">订单</span>
             </a>
           </li>
 
           <li>
-            <a href="{% url 'person:member' %}" class="curr">
+            <a href="member.html" class="curr">
                 <span class="am-icon-user"></span>
                 <span class="am-navbar-label">我的</span>
             </a>
@@ -103,6 +129,6 @@
       </ul>
 </div>
 
+ {% endblock %}
 
-{% endblock %}
 

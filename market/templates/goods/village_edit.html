@@ -1,6 +1,5 @@
 {% extends 'public/base.html' %}
 {% load static %}
-
 {% block meta_css %}
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -95,11 +94,6 @@
     </style>
 
 {% endblock %}
-
-{% block meat_js %}
-    <script src="{% static 'js/area.js' %}"></script>
-{% endblock %}
-
 {% block header %}
     <header data-am-widget="header" class="am-header am-header-default sq-head ">
         <div class="am-header-left am-header-nav">
@@ -108,61 +102,70 @@
             </a>
         </div>
         <h1 class="am-header-title">
-            <a href="" class="">新增收货地址</a>
+            <a href="" class="">地址选择</a>
         </h1>
     </header>
+    <div style="height: 49px;"></div>
 {% endblock %}
 {% block content %}
-    <div style="height: 60px;"></div>
-    <form action="{% url 'order:add' %}" method="post">
-        <ul class="address">
-            {% csrf_token %}
-            <li>
-                <input type="text" name="hcity" value="{{ hcity }}" class="add-input" placeholder="省"/>
-                <a href="{% url 'goods:village' %}">
-                    <i class="am-icon-angle-right" style="float: right; margin-top: 5px;"></i></a>
-            </li>
-            <p style="color: red">{{ error.hcity.0 }}</p>
-            <li>
-                <input type="text" name="hproper" value="{{ hproper }}" class="add-input" placeholder="市"/>
-            </li>
-            <p style="color: red">{{ error.hproper.0 }}</p>
-            <li><input type="text" name="harea" class="add-input" value="{{ harea }}" placeholder="区"/></li>
-            <p style="color: red">{{ error.harea.0 }}</p>
-            <li><input type="text" name="brief" class="add-input" value="{{ brief }}" placeholder="详细地址"/></li>
-            <p style="color: red">{{ error.brief.0 }}</p>
-            <li><input type="text" name="name" class="add-input" value="{{ name }}" placeholder="收货人"/></li>
-            <p style="color: red">{{ error.name.0 }}</p>
-            <li><input type="text" name="tel" class="add-input" value="{{ tel }}" placeholder="13000000000"/></li>
-            <p style="color: red">{{ error.tel.0 }}</p>
 
-        </ul>
-        <div class="moren">
-            <label class="am-checkbox am-warning">
-{#                <input type="checkbox" name='isdefault' checked="checked" data-am-ucheck>设为默认#}
-                                <input type="checkbox" id="default" name='isDefault' checked="checked" value="1" data-am-ucheck>设为默认
-            </label>
+    <div data-role="page" id="test">
+        <div class="ui-content" >
+            <form action="{% url 'order:addedit' %}" method="post">
+                {% csrf_token %}
+                <ul data-role="listview">
+                    <li>
+                        <span style="font-size: 2.1rem  ;margin-left: 5% ;margin-top: 20%">位置:</span><span id="city" style="color:#d7d7d7;padding-left:5px;font-size: 2.1rem">源码时代</span>
+                        <input type="hidden" name="id" value="{{ id }}">
+                    </li>
+
+                </ul>
+                 <input type="submit" class='login-btn' value="确定" >
+            </form>
         </div>
-        <p style="color: red">{{ form.non_field_errors.0 }}</p>
-        <input type="submit" class="login-btn" value="确认提交">
-    </form>
-    {% block foot_js %}
         <script type="text/javascript">
             $("#city").click(function (e) {
                 SelCity(this, e);
                 console.log(this);
             });
-          $(function () {
-              $("#default").on('click', function () {
-                  if ($(this).prop("check") == true) {
-                     $(this).val("1")
-                 } else {
-                     $(this).val("0")
-                  }
-              })
-          })
         </script>
-    {% endblock %}
+    </div>
+
+    {#     <div style="height: 49px;"></div>#}
+    {#	    <div class="cate-search1">#}
+    {#	    	<input type="text" class="cate-input1" placeholder="请输入学校名称" />#}
+    {#	    	<input type="button" class="cate-btn1" />#}
+    {#	    </div>#}
+
+    {#	    <div class="content-list">#}
+    {#	    	<div class="list-left1">#}
+    {#	    		<li><a href="">全国</a></li>#}
+    {#	    		<li class="current"><a href="">兰州</a></li>#}
+    {#	    		<li><a href="">南京</a></li>#}
+    {#	    		<li><a href="">南昌</a></li>#}
+    {#	    		<li><a href="">南通</a></li>#}
+    {#	    		<li><a href="">合肥</a></li>#}
+    {#	    		<li><a href="">宁波</a></li>#}
+    {#	    	</div>#}
+    {#	    	<div class="list-right">#}
+    {#	    		<ul class="vilage-list">#}
+    {#	    			<li>昌北经济技术开发区</li>#}
+    {#	    			<li><a href="">江西青年职业学校</a></li>#}
+    {#	    			<li>红谷滩新区</li>#}
+    {#	    			<li><a href="">南昌航空大学前湖校区</a></li>#}
+    {#	    			<li><a href="">南昌大学前湖校区</a></li>#}
+    {#	    			<li>经开区</li>#}
+    {#	    			<li><a href="">江西科技师范大学枫林校区</a></li>#}
+    {#	    			<li><a href="">江西财经大学麦庐校区</a></li>#}
+    {#	    			<li><a href="">南昌师范学院</a></li>#}
+    {#	    			<li><a href="">江西交通职业技术学院</a></li>#}
+    {#	    			<li><a href="">东华理工大学南昌校区</a></li>#}
+    {#	    			<li><a href="">华东交通大学理工学院</a></li>#}
+    {#	    			<li><a href="">江西财经大学蛟桥校区</a></li>#}
+    {#	    		</ul>#}
+    {#	    	</div>#}
+    {#	    </div>#}
 
 {% endblock %}
+
 

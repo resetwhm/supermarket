@@ -114,3 +114,10 @@ def city(request):
 
 def village(request):
     return render(request, 'goods/village.html')
+
+
+def village_edit(request, id):
+    context = {
+        "id": id
+    }
+    return render(request, 'goods/village_edit.html', context)

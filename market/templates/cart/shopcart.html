@@ -31,7 +31,7 @@
                 <div class="list-cart1">
                     <div class="d-stock">
                         <a class="decrease">-</a>
-                        <input readonly="" sku_id="{{ good.id }}" class="text_box num" name="" type="text"
+                        <input readonly="" sku_id="{{ good.id }}" single_price="{{ good.price }}" class="text_box num" name="" type="text"
                                value="{{ good.num }}">
                         <a class="increase">+</a>
                     </div>
@@ -52,7 +52,7 @@
             <input id="checkall" type="checkbox" checked="checked" value="" data-am-ucheck checked>
         </label>
         <a class="del">全选</a>
-        <a href="tureorder.html" class="js-btn">去结算</a>
+        <a href="javascript:;" class="js-btn" id="mycount">去结算</a>
         <div class="js-text">
 
             <P>合计：<b>￥<span>00.00</span></b></P>
@@ -189,6 +189,36 @@
                     $("#checkall").prop("checked", false);
                     totalprice();
                 }
+            })
+
+
+            //结算
+            $('#mycount').on('click', function () {
+                //商品id , 数量 ,总价
+                var li = $('.shopcart-list').find(':checked').parents('li');
+                var num = li.find('.num');
+                var price = $('.js-text').find('span').text();
+                console.debug(price);
+                {#var count = [];#}
+                var goods =[];
+                {#var single_price =[];#}
+                $.each(num, function (i, e) {
+                    {#count.push($(e).val());#}
+                    goods.push($(e).attr('sku_id'));
+                    {#single_price.push($(e).attr('single_price'));#}
+                });
+                {#console.debug(count);#}
+                console.debug(goods);
+                {#console.debug(single_price);#}
+                $.ajax({
+                    type:"POST",
+                    url:"{% url 'order:tureorder' %}",
+                    data:{"goods":goods,"csrfmiddlewaretoken":"{{ csrf_token }}"},
+                    dataType:"json",
+                    success:function (data) {
+                        console.debug(111)
+                    }
+                })
             })
         })
     </script>

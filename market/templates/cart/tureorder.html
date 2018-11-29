@@ -15,10 +15,24 @@
 
 {% block content %}
     <div style="height: 49px;"></div>
-	    <div class="add-address">
+        {% if address %}
+            <h5 class="order-tit">收货地址</h5>
+            <div class="order-name">
+	    	 <a href="{% url "order:edit" address.id %}">
+	    		<p class="order-tele" style="font-size: 1.6rem">{{ address.name }}&nbsp;&nbsp;&nbsp;{{ address.tel }}</p>
+	    		<p class="order-add" style="font-size: 1.6rem">{{ address.hcity }}{{ address.hproper }}-{{ address.harea }}{{ address.brief }}</p>
+	    	</a>
+	    	<i class="am-icon-angle-right"></i>
+	    </div>
+        {% else %}
+            <div class="add-address">
            <a href="{% url 'order:address' %}">+新建收货地址</a>
            <i class="am-icon-angle-right"></i>
-        </div>
+            </div>
+        {% endif %}
+
+
+
         <div style="background: #eee; height: 10px;"></div>
         <ul class="shopcart-list" style="padding-bottom: 0;">
 	    	<li>
@@ -36,14 +50,13 @@
 	    		<i>￥88.00</i>
 	    	</li>
 	    	<li class="order-infor-first">
-	    		<span>运费：</span>
-	    		<i>包邮</i>
-	    	</li>
-	    	<li class="order-infor-first">
-	    		<a href="">积分抵费></a>
-	    	</li>
-	    	<li class="order-infor-first">
-	    		<a href="">选择优惠券></a>
+	    		<span>运输方式：</span>
+	    		<i><select name="transport" id="">
+                    <option value="1">包邮</option>
+                    <option value="2">顺丰</option>
+                    <option value="3">中通</option>
+                    <option value="4">圆通</option>
+                </select></i>
 	    	</li>
 	    </ul>
 	    <div style="background: #eee; height: 10px;"></div>
@@ -54,7 +67,7 @@
 	    	<div class="order-text">
 	    		应付总额：<span>￥188</span>
 	    	</div>
-	    	<a href="order.html" class="js-btn">提交订单</a>
+	    	<a href="{% url 'order:order' %}" class="js-btn">提交订单</a>
 	    </div>
 <!--底部-->
  <div style="height: 55px;"></div>

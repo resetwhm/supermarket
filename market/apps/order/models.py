@@ -26,3 +26,47 @@
 #
 #     def __str__(self):
 #         return self.name
+#
+#
+# class Order_info(Basemodels):
+#     choices = [
+#         (0, '待付款'),
+#         (1, '退发货'),
+#         (2, '待收货'),
+#         (3, '待评价'),
+#         (4, '已完成'),
+#     ]
+#     ordernum = models.CharField(max_length=255, verbose_name='订单编号')
+#     money = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='订单金额')
+#     user = models.ForeignKey(to="person.register", verbose_name='用户id')
+#     name = models.CharField(max_length=30, verbose_name='收货人姓名')
+#     tel = models.CharField(max_length=11, verbose_name='收货人电话')
+#     order_address = models.CharField(max_length=11, verbose_name='地址信息')
+#     address = models.ForeignKey(to='person.Address', verbose_name='地址id')
+#     order_status = models.SmallIntegerField(choices=choices, verbose_name='订单状态')
+#     transport = models.ForeignKey(to='Transport', verbose_name='运输方式id')
+#     paymethod = models.ForeignKey(to='Paymethod', verbose_name='支付方式id')
+#     real_money = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='实付金额')
+#
+#     class Meta:
+#         db_table = 'order_info'
+#         verbose_name = '订单信息表'
+#         verbose_name_plural = verbose_name
+#
+#     def __str__(self):
+#         return self.ordernum
+#
+#
+# class Order_goods(Basemodels):
+#     order = models.ForeignKey(to='Order_info', verbose_name='订单id')
+#     sku = models.ForeignKey(to='goods.SKU', verbose_name='商品sku_id')
+#     number = models.IntegerField(verbose_name='商品数量')
+#     price = models.DecimalField(max_digits=9, decimal_places=2, verbose_name='商品价格')
+#
+#     class Meta:
+#         db_table = 'order_goods'
+#         verbose_name = '订单商品表'
+#         verbose_name_plural = verbose_name
+#
+#     def __str__(self):
+#         return self.sku

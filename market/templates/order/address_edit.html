@@ -108,42 +108,42 @@
             </a>
         </div>
         <h1 class="am-header-title">
-            <a href="" class="">新增收货地址</a>
+            <a href="" class="">修改收货地址</a>
         </h1>
     </header>
 {% endblock %}
 {% block content %}
     <div style="height: 60px;"></div>
-    <form action="{% url 'order:add' %}" method="post">
+    <form action="{% url 'order:edit' id %}" method="post">
         <ul class="address">
             {% csrf_token %}
             <li>
-                <input type="text" name="hcity" value="{{ hcity }}" class="add-input" placeholder="省"/>
-                <a href="{% url 'goods:village' %}">
+                <input type="text" name="hcity" value="{{ address.hcity }}{{ hcity }}" class="add-input" placeholder="省"/>
+                <a href="{% url 'goods:village_edit' id %}">
                     <i class="am-icon-angle-right" style="float: right; margin-top: 5px;"></i></a>
             </li>
             <p style="color: red">{{ error.hcity.0 }}</p>
             <li>
-                <input type="text" name="hproper" value="{{ hproper }}" class="add-input" placeholder="市"/>
+                <input type="text" name="hproper" value="{{ address.hproper }}{{ hproperh }}" class="add-input" placeholder="市"/>
             </li>
             <p style="color: red">{{ error.hproper.0 }}</p>
-            <li><input type="text" name="harea" class="add-input" value="{{ harea }}" placeholder="区"/></li>
+            <li><input type="text" name="harea" class="add-input" value="{{ address.harea }}{{ harea }}" placeholder="区"/></li>
             <p style="color: red">{{ error.harea.0 }}</p>
-            <li><input type="text" name="brief" class="add-input" value="{{ brief }}" placeholder="详细地址"/></li>
+            <li><input type="text" name="brief" class="add-input" value="{{ address.brief }}" placeholder="详细地址"/></li>
             <p style="color: red">{{ error.brief.0 }}</p>
-            <li><input type="text" name="name" class="add-input" value="{{ name }}" placeholder="收货人"/></li>
+            <li><input type="text" name="name" class="add-input" value="{{ address.name }}" placeholder="收货人"/></li>
             <p style="color: red">{{ error.name.0 }}</p>
-            <li><input type="text" name="tel" class="add-input" value="{{ tel }}" placeholder="13000000000"/></li>
+            <li><input type="text" name="tel" class="add-input" value="{{ address.tel }}" placeholder="13000000000"/>
+            </li>
             <p style="color: red">{{ error.tel.0 }}</p>
 
         </ul>
         <div class="moren">
             <label class="am-checkbox am-warning">
-{#                <input type="checkbox" name='isdefault' checked="checked" data-am-ucheck>设为默认#}
-                                <input type="checkbox" id="default" name='isDefault' checked="checked" value="1" data-am-ucheck>设为默认
+                {#                <input type="checkbox" name='isdefault' checked="checked" data-am-ucheck>设为默认#}
+                 <input type="checkbox" id="default" name='isDefault' {% if address.isDefault %}checked="checked" {% endif %}  data-am-ucheck>设为默认
             </label>
         </div>
-        <p style="color: red">{{ form.non_field_errors.0 }}</p>
         <input type="submit" class="login-btn" value="确认提交">
     </form>
     {% block foot_js %}
@@ -152,15 +152,7 @@
                 SelCity(this, e);
                 console.log(this);
             });
-          $(function () {
-              $("#default").on('click', function () {
-                  if ($(this).prop("check") == true) {
-                     $(this).val("1")
-                 } else {
-                     $(this).val("0")
-                  }
-              })
-          })
+
         </script>
     {% endblock %}
 

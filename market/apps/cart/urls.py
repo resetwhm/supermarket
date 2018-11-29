@@ -6,5 +6,4 @@ from person.views import login, myregister, member, allorder, gladdress, info, f
 urlpatterns = [
     url(r'^shopcart/$', shopcart, name='shopcart'),  # 购物车
     url(r'^addcart/$', addcart, name='addcart'),  #添加购物车
-
 ]

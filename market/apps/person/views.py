@@ -13,7 +13,7 @@ from person.helper import set_password, my_login, send_sms
 from person.models import register, User_info, Address
 
 
-#
+
 def check(old):
     def inner(request, *args, **kwargs):
         id = request.session.get('id')
@@ -106,26 +106,6 @@ def member(request):
         return render(request, 'person/member.html')
 
 
-def allorder(request):
-    id = request.session.get('id')
-    if id:
-        pass
-    else:
-        return render(request, 'person/allorder.html')
-
-
-def gladdress(request):
-    id = request.session.get('id')
-    if id:
-        data = Address.objects.filter(log=id)
-        context = {
-            'data': data
-        }
-        return render(request, 'person/gladdress.html', context)
-    else:
-        return render(request, 'person/gladdress.html')
-
-
 # @check
 def info(request):
     ''' 个人资料 '''
@@ -213,3 +193,23 @@ def send_phone_code(request):
 
     else:
         return JsonResponse({"sta": 1, "err": "请求方式错误"})
+
+
+def gladdress(request):
+    id = request.session.get('id')
+    if id:
+        data = Address.objects.filter(log=id, isdelete=False).order_by('-isDefault')
+        context = {
+            'data': data
+        }
+        return render(request, 'person/gladdress.html', context)
+    else:
+        return render(request, 'person/gladdress.html')
+
+
+def allorder(request):
+    id = request.session.get('id')
+    if id:
+        return render(request, 'person/allorder.html')
+    else:
+        return render(request, 'person/allorder.html')

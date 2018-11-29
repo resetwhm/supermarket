@@ -53,7 +53,7 @@ class Address(Basemodels):
     hproper = models.CharField(max_length=100, blank=True, default='', verbose_name="市")
     harea = models.CharField(max_length=100, blank=True, default='', verbose_name="区")
     brief = models.CharField(max_length=255, verbose_name="详细地址")
-    isDefault = models.BooleanField(default=False, blank=True, verbose_name="是否设置为默认")
+    isDefault = models.BooleanField(default=False, blank=True, verbose_name="是否设置为默认", null=False)
 
     class Meta:
         db_table = 'address'

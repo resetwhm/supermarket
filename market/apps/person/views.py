@@ -13,7 +13,6 @@ from person.helper import set_password, my_login, send_sms
 from person.models import register, User_info, Address
 
 
-
 def check(old):
     def inner(request, *args, **kwargs):
         id = request.session.get('id')

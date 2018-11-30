@@ -15,65 +15,72 @@
 
 {% block content %}
     <div style="height: 49px;"></div>
-    {% if address %}
-        <h5 class="order-tit">默认收货地址</h5>
-        <div class="order-name">
-            <a href="{% url "order:edit" address.id %}">
-                <p class="order-tele"
-                   style="font-size: 1.6rem">{{ address.name }}&nbsp;&nbsp;&nbsp;{{ address.tel }}</p>
-                <p class="order-add" style="font-size: 1.6rem">
-                    {{ address.hcity }}{{ address.hproper }}-{{ address.harea }}{{ address.brief }}</p>
-            </a>
-            <i class="am-icon-angle-right"></i>
-        </div>
-    {% else %}
-        <div class="add-address">
-            <a href="{% url 'order:address' %}">+新建收货地址</a>
-            <i class="am-icon-angle-right"></i>
-        </div>
-    {% endif %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {% if address %}
+            <input type="hidden" name="address" value="{{ address.pk }}">
+            <h5 class="order-tit">默认收货地址</h5>
+            <div class="order-name">
+                <a href="{% url "person:gladdress" %}">
+                    <p class="order-tele"
+                       style="font-size: 1.6rem">{{ address.name }}&nbsp;&nbsp;&nbsp;{{ address.tel }}</p>
+                    <p class="order-add" style="font-size: 1.6rem">
+                        {{ address.hcity }}{{ address.hproper }}-{{ address.harea }}{{ address.brief }}</p>
+                </a>
+                <i class="am-icon-angle-right"></i>
+            </div>
+        {% else %}
+            <div class="add-address">
+                <a href="{% url 'order:address' %}">+新建收货地址</a>
+                <i class="am-icon-angle-right"></i>
+            </div>
+        {% endif %}
 
 
 
-    <div style="background: #eee; height: 10px;"></div>
-    <ul class="shopcart-list" style="padding-bottom: 0;">
-        {% for goods in goodslist %}
-            <li>
-                <img src="{{ MEDIA_URL }}{{ goods.img }}" class="shop-pic"/>
-                <div class="order-mid">
-                    <div class="tit">{{ goods.name }}</div>
-                    <div class="order-price">￥<span class="price">{{ goods.price }}</span> <i>X<span
-                            class="num">{{ goods.num }}</span></i></div>
-                </div>
+        <div style="background: #eee; height: 10px;"></div>
+        <ul class="shopcart-list" style="padding-bottom: 0;">
+            {% for goods in goodslist %}
+                <li>
+                    <input type="hidden" name="sku_id" value="{{ goods.pk }}">
+                    <img src="{{ MEDIA_URL }}{{ goods.img }}" class="shop-pic"/>
+                    <div class="order-mid">
+                        <div class="tit">{{ goods.name }}</div>
+                        <div class="order-price">￥<span class="price">{{ goods.price }}</span> <i>X<span
+                                class="num">{{ goods.num }}</span></i></div>
+                    </div>
+                </li>
+            {% endfor %}
+
+        </ul>
+        <ul class="order-infor">
+            <li class="order-infor-first">
+                <span>商品总计：</span>
+                <i>￥<span id="total"></span></i>
             </li>
-        {% endfor %}
+            <li class="order-infor-first">
+                <span>运输方式：</span>
 
-    </ul>
-    <ul class="order-infor">
-        <li class="order-infor-first">
-            <span>商品总计：</span>
-            <i>￥<span id="total"></span></i>
-        </li>
-        <li class="order-infor-first">
-            <span>运输方式：</span>
-            <i><span>￥<span id="transmoney">20</span></span>
-                <select name="transport" id="">
-                <option value="1">包邮</option>
-                <option value="2">顺丰</option>
-                <option value="3">中通</option>
-                <option value="4">圆通</option>
-            </select></i>
-        </li>
-    </ul>
+                <i>
+                    <select name="transport" id="">
+                        {% for t in transport %}
+                            <option name="{{ t.id }}" value="{{ t.id }}" transmoney="{{ t.money }}">{{ t.name }} --￥{{ t.money }}</option>
+                        {% endfor %}
+                    </select>
+                </i>
+            </li>
+        </ul>
+
     <div style="background: #eee; height: 10px;"></div>
-    <textarea placeholder="备注说明" class="bz-infor"></textarea>
+    <textarea placeholder="备注说明" name="comment" class="bz-infor"></textarea>
+     </form>
     <div style="background: #eee; height: 10px;"></div>
     <div style="height: 55px;"></div>
     <div class="shop-fix">
         <div class="order-text">
             应付总额：<span>￥<span id="myprice"></span></span>
         </div>
-        <a href="{% url 'order:order' %}" class="js-btn">提交订单</a>
+        <a href="javascript:;" class="js-btn">提交订单</a>
     </div>
     <!--底部-->
     <div style="height: 55px;"></div>
@@ -118,20 +125,45 @@
     <script>
         $(function () {
             // 计算价格
-            var li = $(".shopcart-list li");
-            var price = 0;
-            $.each(li, function (i, e) {
-                var single_price = $(e).find(".price").text();
-                var number = $(e).find(".num").text();
-                price += single_price*number
-            });
-            {#console.debug(price.toFixed(2))#}
-            $('.order-infor').find("#total").text(price.toFixed(2));
-            var transmoney = $('.order-infor-first').find("#transmoney").text();
-            myprice = price + parseInt(transmoney) ;
-            $('.order-text').find("#myprice").text(myprice.toFixed(2))
+            function totalprice() {
+                var li = $(".shopcart-list li");
+                var price = 0;
+                $.each(li, function (i, e) {
+                    var single_price = $(e).find(".price").text();
+                    var number = $(e).find(".num").text();
+                    price += single_price * number
+                });
 
+                $('.order-infor').find("#total").text(price.toFixed(2));
+                var transmoney = $('.order-infor-first').find(":selected").attr('transmoney');
+                myprice = parseFloat(price) + parseFloat(transmoney);
+                $('.order-text').find("#myprice").text(myprice.toFixed(2));
+            }
+
+            totalprice();
+
+            $('.order-infor-first').find("select").on("change", function () {
+                totalprice();
+            });
+
+            $(".js-btn").on("click", function () {
+                var data = $('form').serialize();
+                $.ajax({
+                    type:"post",
+                    url:"",
+                    data:data,
+                    dataType:"json",
+                    success:function (data) {
+                        if(data.code==0){
+                           location.href="{% url 'order:order' %}?ordernum="+data.ordernum
+                        }else{
+                            alert('订单生成失败')
+                        }
+                    }
+                })
+            })
         })
+
     </script>
 {% endblock %}
 

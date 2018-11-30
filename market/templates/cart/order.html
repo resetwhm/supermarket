@@ -3,12 +3,6 @@
 {% block meat_js %}
     <script src="{% static 'js/date.js' %}"></script>
 		<script src="{% static 'js/iscroll.js' %}"></script>
-{#		<script type="text/javascript">#}
-{#			$(function(){#}
-{#				$('#beginTime').date();#}
-{#				$('#endTime').date({theme:"datetime"});#}
-{#			});#}
-{#        </script>#}
 {% endblock %}
  {% block header %}
     <header data-am-widget="header" class="am-header am-header-default sq-head ">
@@ -27,22 +21,22 @@
 	    <h5 class="order-tit">收货人信息</h5>
 	    <div class="order-name">
 	    	<a href="javascript:;">
-	    		<p class="order-tele">{{ address.name }}&nbsp;&nbsp;&nbsp;{{ address.tel }}</p>
-	    		<p class="order-add"> {{ address.hcity }}{{ address.hproper }}-{{ address.harea }}{{ address.brief }}</p>
+	    		<p class="order-tele">{{ order.name }}&nbsp;&nbsp;&nbsp;{{ order.tel }}</p>
+	    		<p class="order-add"> {{ order.address }} </p>
 	    	</a>
 	    	<i class="am-icon-angle-right"></i>
 	    </div>
         <div style="background: #eee; height: 10px;"></div>
         <h5 class="order-tit">确认订单信息</h5>
         <ul class="shopcart-list" style="padding-bottom: 0; margin-top: 0;">
-        {% for goods in goodslist %}
+        {% for goods in order.order_goods_set.all %}
 
 	    	<li>
-                <img src="{{ MEDIA_URL }}{{ goods.img }}" class="shop-pic" />
+                <img src="{{ MEDIA_URL }}{{ goods.sku.img }}" class="shop-pic" />
                 <div class="order-mid">
-                	<div class="tit">{{ goods.name }}</div>
-                	<div class="order-price">￥<span class="price">{{ goods.price }}</span> <i>X<span
-                            class="num">{{ goods.num }}</span></i></div>
+                	<div class="tit">{{ goods.sku.spu.name }}{{ goods.sku.name }}</div>
+                	<div class="order-price">￥<span class="price">{{ goods.price }}</span> <i>X{{ goods.number }}<span
+                            class="num"> </span></i></div>
                 </div>
 	    	</li>
         {% endfor %}
@@ -51,11 +45,11 @@
 	    <ul class="order-infor">
 	    	<li class="order-infor-first">
 	    		<span>商品总计：</span>
-	    		<i>￥<span id="total"></span></i>
+	    		<i>￥<span id="total">{{ order.order_money }}</span></i>
 	    	</li>
 	    	<li class="order-infor-first">
 	    		<span>运费：</span>
-	    		<i>包邮<span>￥<span id="transmoney">20</span></span></i>
+	    		<i>{{ order.transport }}<span>￥<span id="transmoney">{{ order.trans_money }}</span></span></i>
 	    	</li>
 	    </ul>
 	    <!--<div style="background: #eee; height: 10px;"></div>
@@ -63,7 +57,7 @@
 	    <input id="beginTime" class="select-time" placeholder="请选择配送时间 >" /></div>
 		<div id="datePlugin"></div>-->
 	    <div style="background: #eee; height: 10px;"></div>
-	    <textarea placeholder="备注说明" class="bz-infor"></textarea>
+	    <textarea placeholder="备注说明" class="bz-infor">{{ order.comment }}</textarea>
 	    <div style="background: #eee; height: 10px;"></div>
 
          <ul class="pay-style">
@@ -92,7 +86,7 @@
        <div style="height: 55px;"></div>
 	    <div class="shop-fix">
 	    	<div class="order-text">
-	    		应付总额：<span>￥<span id="myprice"></span></span>
+	    		应付总额：<span>￥<span id="myprice">{{ order.total }}</span></span>
 	    	</div>
 	    	<a href="" class="js-btn">确认支付</a>
 	    </div>
@@ -136,25 +130,4 @@
 
  {% endblock %}
 
-{% block foot_js %}
-<script>
-        $(function () {
-            // 计算价格
-            var li = $(".shopcart-list li");
-            var price = 0;
-            $.each(li, function (i, e) {
-                var single_price = $(e).find(".price").text();
-                var number = $(e).find(".num").text();
-                price += single_price*number
-            });
-            {#console.debug(price.toFixed(2))#}
-            $('.order-infor').find("#total").text(price.toFixed(2));
-            var transmoney = $('.order-infor-first').find("#transmoney").text();
-            myprice = price + parseInt(transmoney) ;
-            $('.order-text').find("#myprice").text(myprice.toFixed(2))
 
-            // 提交订
-
-        })
-    </script>
-{% endblock %}

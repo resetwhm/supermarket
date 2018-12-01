@@ -188,3 +188,22 @@ HAYSTACK_CONNECTIONS = {
 #当添加、修改、删除数据时，自动生成索引
 HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
+
+
+# # 七牛云密钥等配置
+# QINIU_ACCESS_KEY = 'EO6_JKAYMuwttDgG8yj4jmsYDBg1zGXJr07s95YH'
+# QINIU_SECRET_KEY = 'ul6OeTdFdTEikUumen1jwvbtzmxl1ljFA_M6cQD2'
+# QINIU_BUCKET_NAME = 'market'
+# QINIU_BUCKET_DOMAIN = 'pj1vf3xt8.bkt.clouddn.com/'
+# QINIU_SECURE_URL = False      #使用https
+# PREFIX_URL = 'http://'
+#
+# # 上传文件地址配置
+# MEDIA_URL = PREFIX_URL + QINIU_BUCKET_DOMAIN + "/"
+# # 上传文件的存储引擎配置
+# DEFAULT_FILE_STORAGE = 'qiniustorage.backends.QiniuStorage'
+#
+# # 静态文件的url配置
+# STATIC_URL = QINIU_BUCKET_DOMAIN + '/static/'
+# # 静态文件的存储引擎
+# STATICFILES_STORAGE = 'qiniustorage.backends.QiniuStaticStorage'

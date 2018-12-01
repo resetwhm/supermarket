@@ -7,6 +7,7 @@ from django.http import JsonResponse, HttpResponse
 from django.shortcuts import render, redirect
 from django_redis import get_redis_connection
 
+from order.models import Order_info
 from person.forms import MyregisterFrom, MyloginForm, ForgetFrom
 from person.helper import set_password, my_login, send_sms
 
@@ -208,6 +209,8 @@ def gladdress(request):
 
 def allorder(request):
     id = request.session.get('id')
+    order_id = request.GET.get('order_id')
+    # Order_info.objects.filter(order_id=order_id).update()
     if id:
         return render(request, 'person/allorder.html')
     else:

@@ -1,18 +1,23 @@
+import os
 import random
 
+from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django_redis import get_redis_connection
 
 from goods.models import SKU
+from market.settings import BASE_DIR
 from order.forms import AddressForm, AddresseditForm
 from order.models import Transport, Order_info, Order_goods
 from person.models import Address
 
 from datetime import datetime
 
-
 # 地址三级联动
+# from utils.alipay.alipay import AliPay
+from alipay import AliPay
+
 def address(request):
     if request.method == "POST":
         data = request.POST
@@ -145,6 +150,7 @@ def addorder(request):
 
 
 # 购物车
+@transaction.atomic
 def tureorder(request):
     if request.method == 'POST':
         # 是否登录
@@ -180,6 +186,8 @@ def tureorder(request):
         except transport.DoesNotExist:
             return JsonResponse({"code": 5, "err": "运输方式不存在"})
 
+        # 设置保存点
+        # sid = transaction.savepoint()
         # 保存订单信息
         r = get_redis_connection('default')
         user_key = "user_key_{}".format(id)
@@ -200,8 +208,9 @@ def tureorder(request):
         total = 0
         for sku_id in sku:
             try:
-                goodssku = SKU.objects.get(pk=sku_id, isdelete=False, is_up=True)
+                goodssku = SKU.objects.select_for_update().get(pk=sku_id, isdelete=False, is_up=True)
             except SKU.DoesNotExist:
+                # transaction.savepoint_commit(sid)
                 return JsonResponse({"code": 6, "err": "商品不存在"})
 
             # 获取商品的数量
@@ -216,6 +225,7 @@ def tureorder(request):
             )
             # 检查库存是否充足
             if goodssku.stock < count:
+                # transaction.savepoint_commit(sid)
                 return JsonResponse({"code": 7, "err": "库存不足"})
             # 销量增加,库存减少
             goodssku.sell += count
@@ -234,9 +244,14 @@ def tureorder(request):
             order.comment = comment
             order.save()
         except:
+            # 回滚事务
+            # transaction.savepoint_commit(sid)
             return JsonResponse({"code": 8, "err": "总价保存失败"})
         # 删除购物车的商品信息
+
         r.hdel(user_key, *sku)
+        # 提交事务
+        # transaction.commit(sid)
         return JsonResponse({"code": 0, "ordernum": ordernum})
 
     else:
@@ -250,7 +265,10 @@ def tureorder(request):
             sku = SKU.objects.get(pk=sku_id)
             r = get_redis_connection('default')
             num = r.hget(order_key, sku_id)
-            sku.num = int(num)
+            try:
+                sku.num = int(num)
+            except:
+                return redirect("cart:shopcart")
             # 计算总价
             price += sku.price * sku.num
             goodslist.append(sku)
@@ -265,9 +283,67 @@ def tureorder(request):
 
 
 def order(request):
-    ordernum = request.GET.get("ordernum")
-    order = Order_info.objects.get(ordernum=ordernum)
-    context = {
-        "order": order
-    }
-    return render(request, 'cart/order.html', context)
+    if request.method == "POST":
+        order_id = request.POST.get("order")
+        order = Order_info.objects.get(pk=order_id)
+        price = str(order.total)
+
+        app_private_key_string = open(os.path.join(BASE_DIR, 'apps/utils/alipay/ying_yong_si_yao.txt')).read()
+        alipay_public_key_string = open(os.path.join(BASE_DIR, 'apps/utils/alipay/ying_yong_gong_yao.txt')).read()
+
+        alipay = AliPay(
+            appid="2016092400584100",
+            app_notify_url=None,  # 默认回调url
+            app_private_key_string=app_private_key_string,
+            # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+            alipay_public_key_string=alipay_public_key_string,
+            sign_type="RSA2",  # RSA 或者 RSA2
+            debug=True  # 默认False
+        )
+
+        order_string = alipay.api_alipay_trade_wap_pay(
+            out_trade_no=order.ordernum,
+            total_amount=price,
+            subject="超市支付",
+            return_url="http://127.0.0.1:8000/cart/pay/",
+            notify_url=None  # 可选, 不填则使用默认notify url
+        )
+        re_url = "https://openapi.alipaydev.com/gateway.do?{data}".format(data=order_string)
+
+        # 电脑版
+        # """支付请求过程"""
+        # # 传递参数初始化支付类
+        # alipay = AliPay(
+        #     appid="2016092400584100",  # 设置签约的appid
+        #     app_notify_url="http://127.0.0.1:8000/cart/pay/",  # 异步支付通知url
+        #     app_private_key_path=os.path.join(BASE_DIR, 'apps/utils/alipay/ying_yong_si_yao.txt'),  # 设置应用私钥
+        #     alipay_public_key_path=os.path.join(BASE_DIR, 'apps/utils/alipay/zhi_fu_bao_gong_yao.txt'),
+        #     # 支付宝的公钥，验证支付宝回传消息使用，不是你自己的公钥,
+        #     debug=True,  # 默认False,                                   # 设置是否是沙箱环境，True是沙箱环境
+        #     return_url="http://127.0.0.1:8000/cart/pay/"  # 同步支付通知url
+        # )
+        #
+        # price = str(order.total)
+        # # 传递参数执行支付类里的direct_pay方法，返回签名后的支付参数，
+        # url = alipay.direct_pay(
+        #     subject="超市支付",  # 订单名称
+        #     # 订单号生成，一般是当前时间(精确到秒)+用户ID+随机数
+        #     out_trade_no=order.ordernum,  # 订单号
+        #     total_amount=price,  # 支付金额
+        #     return_url="http://127.0.0.1:8000/cart/pay/"  # 支付成功后，跳转url
+        # )
+        #
+        # # 将前面后的支付参数，拼接到支付网关
+        # # 注意：下面支付网关是沙箱环境，
+        # re_url = "https://openapi.alipaydev.com/gateway.do?{data}".format(data=url)
+        # # print(re_url)
+        # # 最终进行签名后组合成支付宝的url请求
+
+        return JsonResponse({"code": 0, "url": re_url})
+    else:
+        ordernum = request.GET.get("ordernum")
+        order = Order_info.objects.get(ordernum=ordernum)
+        context = {
+            "order": order
+        }
+        return render(request, 'cart/order.html', context)
